@@ -22,6 +22,8 @@
         styleCaching: 'strict',
         // Default cors config is to request the image address directly
         corsImg: undefined,
+        // Callback for adjustClonedNode eventing (to allow adjusting clone's properties)
+        adjustClonedNode: undefined,
     };
 
     const domtoimage = {
@@ -83,6 +85,7 @@
      *         - @param {Enumerator} method - get, post
      *         - @param {Object} headers - eg: { "Content-Type", "application/json;charset=UTF-8" }
      *         - @param {Object} data - post payload
+     * @param {Function} options.adjustClonedNode - callback for adjustClonedNode eventing (to allow adjusting clone's properties)
      * @return {Promise} - A promise that is fulfilled with a SVG image data URL
      * */
     function toSvg(node, options) {
@@ -266,7 +269,7 @@
             domtoimage.impl.options.cacheBust = options.cacheBust;
         }
 
-        if (typeof(options.corsImg) === 'undefined') {
+        if (typeof options.corsImg === 'undefined') {
             domtoimage.impl.options.corsImg = defaultOptions.corsImg;
         } else {
             domtoimage.impl.options.corsImg = options.corsImg;
@@ -352,9 +355,11 @@
 
         return Promise.resolve(node)
             .then(makeNodeCopy)
+            .then(adjustCloneBefore)
             .then(function (clone) {
                 return cloneChildren(clone, getParentOfChildren(node));
             })
+            .then(adjustCloneAfter)
             .then(function (clone) {
                 return processClone(clone, node);
             });
@@ -364,6 +369,20 @@
                 return util.makeImage(original.toDataURL());
             }
             return original.cloneNode(false);
+        }
+
+        function adjustCloneBefore(clone) {
+            if (options.adjustClonedNode) {
+                options.adjustClonedNode(node, clone, false);
+            }
+            return Promise.resolve(clone);
+        }
+
+        function adjustCloneAfter(clone) {
+            if (options.adjustClonedNode) {
+                options.adjustClonedNode(node, clone, true);
+            }
+            return Promise.resolve(clone);
         }
 
         function getParentOfChildren(original) {
@@ -804,15 +823,27 @@
                         request.withCredentials = true;
                     }
 
-                    if (domtoimage.impl.options.corsImg
-                        && url.indexOf('http') === 0 
-                        && url.indexOf(window.location.origin) === -1) {
-                        const method = (domtoimage.impl.options.corsImg.method || 'GET').toUpperCase() === 'POST' 
-                            ? 'POST' 
-                            : 'GET';
+                    if (
+                        domtoimage.impl.options.corsImg &&
+                        url.indexOf('http') === 0 &&
+                        url.indexOf(window.location.origin) === -1
+                    ) {
+                        const method =
+                            (
+                                domtoimage.impl.options.corsImg.method || 'GET'
+                            ).toUpperCase() === 'POST'
+                                ? 'POST'
+                                : 'GET';
 
-                        request.open(method, (domtoimage.impl.options.corsImg.url || '').replace('#{cors}', url), true);
-    
+                        request.open(
+                            method,
+                            (domtoimage.impl.options.corsImg.url || '').replace(
+                                '#{cors}',
+                                url
+                            ),
+                            true
+                        );
+
                         let isJson = false;
                         const headers = domtoimage.impl.options.corsImg.headers || {};
                         Object.keys(headers).forEach(function (key) {
@@ -822,10 +853,12 @@
                             request.setRequestHeader(key, headers[key]);
                         });
 
-                        const corsData = handleJson(domtoimage.impl.options.corsImg.data || '');
-    
+                        const corsData = handleJson(
+                            domtoimage.impl.options.corsImg.data || ''
+                        );
+
                         Object.keys(corsData).forEach(function (key) {
-                            if (typeof(corsData[key]) === 'string') {
+                            if (typeof corsData[key] === 'string') {
                                 corsData[key] = corsData[key].replace('#{cors}', url);
                             }
                         });
@@ -1371,8 +1404,8 @@
         const docType = document.doctype;
         const docTypeDeclaration = docType
             ? `<!DOCTYPE ${escapeHTML(docType.name)} ${escapeHTML(
-                  docType.publicId
-              )} ${escapeHTML(docType.systemId)}`.trim() + '>'
+                docType.publicId
+            )} ${escapeHTML(docType.systemId)}`.trim() + '>'
             : '';
 
         // Create a hidden sandbox <iframe> element within we can create default HTML elements and query their

@@ -15,7 +15,29 @@
             assert.ok(domtoimage);
         });
 
-        describe('regression', function () {
+        describe('features', function () {
+            it('should handle adjustClonedNode', function (done) {
+                function oncloned(_node, clone, after) {
+                    /* jshint unused:false */
+                    if(!after) {                  
+                        if (clone.id === 'element') {
+                            clone.style.transform = 'translateY(100px)';
+                        }
+                    }
+                    return clone;                   
+                }
+
+                loadTestPage(
+                    'eventing/dom-node.html',
+                    'eventing/style.css',
+                    'eventing/control-image'
+                )
+                    .then(() => renderToPng(domNode(), { adjustClonedNode: oncloned }))
+                    .then(check)
+                    .then(done)
+                    .catch(done);
+            });
+
             it('should render to svg', function (done) {
                 loadTestPage(
                     'small/dom-node.html',
