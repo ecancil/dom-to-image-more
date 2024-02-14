@@ -139,6 +139,20 @@ domtoimage.toCanvas(document.getElementById('my-node')).then(function (canvas) {
 });
 ```
 
+Adjust cloned nodes before/after children are cloned [sample fiddle](https://jsfiddle.net/IDisposable/grLtjwe5/12/)
+
+```javascript
+const adjustClone = (node, clone, after) => {
+  if (!after && clone.id === 'element') {
+    clone.style.transform = 'translateY(100px)';
+  }
+  return clone;                   
+}
+
+const wrapper = document.getElementById('wrapper');
+const blob =  domtoimage.toBlob(wrapper, { adjustClonedNode: adjustClone});
+```
+
 ---
 
 _All the functions under `impl` are not public API and are exposed only for unit testing._
