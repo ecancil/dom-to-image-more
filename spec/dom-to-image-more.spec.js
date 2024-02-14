@@ -19,12 +19,12 @@
             it('should handle adjustClonedNode', function (done) {
                 function oncloned(_node, clone, after) {
                     /* jshint unused:false */
-                    if(!after) {                  
+                    if (!after) {
                         if (clone.id === 'element') {
                             clone.style.transform = 'translateY(100px)';
                         }
                     }
-                    return clone;                   
+                    return clone;
                 }
 
                 loadTestPage(

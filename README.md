@@ -139,18 +139,19 @@ domtoimage.toCanvas(document.getElementById('my-node')).then(function (canvas) {
 });
 ```
 
-Adjust cloned nodes before/after children are cloned [sample fiddle](https://jsfiddle.net/IDisposable/grLtjwe5/12/)
+Adjust cloned nodes before/after children are cloned
+[sample fiddle](https://jsfiddle.net/IDisposable/grLtjwe5/12/)
 
 ```javascript
 const adjustClone = (node, clone, after) => {
-  if (!after && clone.id === 'element') {
-    clone.style.transform = 'translateY(100px)';
-  }
-  return clone;                   
-}
+    if (!after && clone.id === 'element') {
+        clone.style.transform = 'translateY(100px)';
+    }
+    return clone;
+};
 
 const wrapper = document.getElementById('wrapper');
-const blob =  domtoimage.toBlob(wrapper, { adjustClonedNode: adjustClone});
+const blob = domtoimage.toBlob(wrapper, { adjustClonedNode: adjustClone });
 ```
 
 ---
@@ -202,6 +203,11 @@ Defaults to undefined and will throw an error on failed images
 Set to true to enable the copying of the default styles of elements. This will make the
 process faster. Try disabling it if seeing extra padding and using resetting / normalizing
 in CSS. Defaults to true.
+
+#### useCredentialFeatures
+
+Allows optionally setting the `useCredentials` option if the resource matches a pattern in
+the `useCredentialFilters` array.
 
 ### Alternative Solutions to CORS Policy Issue
 
@@ -344,7 +350,8 @@ Klimas (fixes), Edgardo Di Gesto (fixes), 樊冬 Fan Dong (fixes), Shrijan Tripa
 SNDST00M (optimize), Joseph White (performance CSS), Phani Rithvij (test), David
 DOLCIMASCOLO (packaging), Zee (ZM) @zm-cttae (many major updates), Joshua Walsh
 @JoshuaWalsh (Firefox issues), Emre Coban @emrecoban (documentation), Nate Stuyvesant
-@nstuyvesant (fixes), King Wang @eachmawzw (CORS image proxy)
+@nstuyvesant (fixes), King Wang @eachmawzw (CORS image proxy), TMM Schmit @tmmschmit
+(useCredentialsFilters)
 
 ## License
 
