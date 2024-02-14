@@ -16,6 +16,8 @@
         cacheBust: false,
         // Use (existing) authentication credentials for external URIs (CORS requests)
         useCredentials: false,
+        // Use (existing) authentication credentials for external URIs (CORS requests) on some filtered requests only
+        useCredentialsFilters: [],
         // Default resolve timeout
         httpTimeout: 30000,
         // Style computation cache tag rules (options are strict, relaxed)
@@ -279,6 +281,13 @@
             domtoimage.impl.options.useCredentials = defaultOptions.useCredentials;
         } else {
             domtoimage.impl.options.useCredentials = options.useCredentials;
+        }
+
+        if (typeof options.useCredentialsFilters === 'undefined') {
+            domtoimage.impl.options.useCredentialsFilters =
+                defaultOptions.useCredentialsFilters;
+        } else {
+            domtoimage.impl.options.useCredentialsFilters = options.useCredentialsFilters;
         }
 
         if (typeof options.httpTimeout === 'undefined') {
@@ -819,6 +828,14 @@
                     request.ontimeout = timeout;
                     request.responseType = 'blob';
                     request.timeout = httpTimeout;
+
+                    if (domtoimage.impl.options.useCredentialsFilters.length > 0) {
+                        domtoimage.impl.options.useCredentials =
+                            domtoimage.impl.options.useCredentialsFilters.filter(
+                                (credentialsFilter) => url.search(credentialsFilter) >= 0
+                            ).length > 0;
+                    }
+
                     if (domtoimage.impl.options.useCredentials) {
                         request.withCredentials = true;
                     }
@@ -1404,8 +1421,8 @@
         const docType = document.doctype;
         const docTypeDeclaration = docType
             ? `<!DOCTYPE ${escapeHTML(docType.name)} ${escapeHTML(
-                docType.publicId
-            )} ${escapeHTML(docType.systemId)}`.trim() + '>'
+                  docType.publicId
+              )} ${escapeHTML(docType.systemId)}`.trim() + '>'
             : '';
 
         // Create a hidden sandbox <iframe> element within we can create default HTML elements and query their
