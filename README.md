@@ -209,6 +209,11 @@ in CSS. Defaults to true.
 Allows optionally setting the `useCredentials` option if the resource matches a pattern in
 the `useCredentialFilters` array.
 
+#### scale
+
+Scale value to be applied on canvas's `ctx.scale()` on both x and y axis.
+Can be used to increase the image quality with higher image size.
+
 ### Alternative Solutions to CORS Policy Issue
 
 Are you facing a [CORS policy](https://developer.mozilla.org/en-US/docs/Web/HTTP/CORS)
