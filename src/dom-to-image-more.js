@@ -932,7 +932,7 @@
                         try {
                             return JSON.parse(JSON.stringify(data));
                         } catch (e) {
-                            fail('corsImg.data is missing or invalid');
+                            fail('corsImg.data is missing or invalid', e.toString());
                             return;
                         }
                     }
