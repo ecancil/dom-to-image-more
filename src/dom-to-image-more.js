@@ -1260,7 +1260,7 @@
 
             // Ignore setting style property on clone node, if already it has a style (through adjustCloneNode)
             const targetValue = targetStyle.getPropertyValue(name);
-            if(targetValue) return;   
+            if (targetValue) return;
 
             // If the style does not match the default, or it does not match the parent's, set it. We don't know which
             // styles are inherited from the parent and which aren't, so we have to always check both.
