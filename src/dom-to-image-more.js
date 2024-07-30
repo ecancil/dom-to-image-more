@@ -8,6 +8,7 @@
 
     // Default impl options
     const defaultOptions = {
+        fontList: [],
         // Default is to copy default styles of elements
         copyDefaultStyles: true,
         // Default is to fail on error, no placeholder
@@ -100,7 +101,7 @@
             .then(function (clonee) {
                 return cloneNode(clonee, options, null, ownerWindow);
             })
-            //.then(embedFonts)
+            .then(embedFonts)
             .then(inlineImages)
             .then(applyOptions)
             .then(makeSvgDataUri)
@@ -253,6 +254,12 @@
 
     function copyOptions(options) {
         // Copy options to impl options for use in impl
+        if (typeof options.fontList === 'undefined') {
+            domtoimage.impl.options.fontList = defaultOptions.fontList;
+        } else {
+            domtoimage.impl.options.fontList = options.fontList;
+        }
+
         if (typeof options.copyDefaultStyles === 'undefined') {
             domtoimage.impl.options.copyDefaultStyles = defaultOptions.copyDefaultStyles;
         } else {
@@ -589,7 +596,6 @@
         }
     }
 
-/*
     function embedFonts(node) {
         return fontFaces.resolveAll().then(function (cssText) {
             if (cssText !== '') {
@@ -600,7 +606,6 @@
             return node;
         });
     }
-        */
 
     function inlineImages(node) {
         return images.inlineAll(node).then(function () {
@@ -1078,6 +1083,7 @@
     }
 
     function newFontFaces() {
+        const fontList = domtoimage.impl.options.fontList;
         return {
             resolveAll: resolveAll,
             impl: {
@@ -1113,7 +1119,8 @@
                         return rule.type === CSSRule.FONT_FACE_RULE;
                     })
                     .filter(function (rule) {
-                        return inliner.shouldProcess(rule.style.getPropertyValue('src'));
+                        const fontName = getFontNameFromRule(rule);
+                        return fontList.includes(fontName) && inliner.shouldProcess(rule.style.getPropertyValue('src'));
                     });
             }
 
@@ -1151,6 +1158,13 @@
                         return webFontRule.style.getPropertyValue('src');
                     },
                 };
+            }
+
+            function getFontNameFromRule(rule) {
+                // Extract font name from the rule if possible
+                // This is a placeholder; adjust based on how font names are defined in your CSS
+                const fontFamily = rule.style.getPropertyValue('font-family');
+                return fontFamily.split(',')[0].trim().replace(/['"]/g, ''); // Simplistic parsing, adjust as needed
             }
         }
     }
@@ -1427,8 +1441,8 @@
         const docType = document.doctype;
         const docTypeDeclaration = docType
             ? `<!DOCTYPE ${escapeHTML(docType.name)} ${escapeHTML(
-                  docType.publicId
-              )} ${escapeHTML(docType.systemId)}`.trim() + '>'
+                docType.publicId
+            )} ${escapeHTML(docType.systemId)}`.trim() + '>'
             : '';
 
         // Create a hidden sandbox <iframe> element within we can create default HTML elements and query their
