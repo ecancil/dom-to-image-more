@@ -82,7 +82,6 @@
      * @param {Boolean} options.cacheBust - set to true to cache bust by appending the time to the request url
      * @param {String} options.styleCaching - set to 'strict', 'relaxed' to select style caching rules
      * @param {Boolean} options.copyDefaultStyles - set to false to disable use of default styles of elements
-     * @param {Boolean} options.disableEmbedFonts - set to true to disable font embedding into the SVG output.
      * @param {Object} options.corsImg - When the image is restricted by the server from cross-domain requests, the proxy address is passed in to get the image
      *         - @param {String} url - eg: https://cors-anywhere.herokuapp.com/
      *         - @param {Enumerator} method - get, post
@@ -101,7 +100,7 @@
             .then(function (clonee) {
                 return cloneNode(clonee, options, null, ownerWindow);
             })
-            .then(disableEmbedFonts ? undefined : embedFonts)
+            //.then(embedFonts)
             .then(inlineImages)
             .then(applyOptions)
             .then(makeSvgDataUri)
@@ -590,6 +589,7 @@
         }
     }
 
+/*
     function embedFonts(node) {
         return fontFaces.resolveAll().then(function (cssText) {
             if (cssText !== '') {
@@ -600,6 +600,7 @@
             return node;
         });
     }
+        */
 
     function inlineImages(node) {
         return images.inlineAll(node).then(function () {
