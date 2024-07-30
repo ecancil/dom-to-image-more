@@ -1083,7 +1083,6 @@
     }
 
     function newFontFaces() {
-        const fontList = domtoimage.impl.options.fontList;
         return {
             resolveAll: resolveAll,
             impl: {
@@ -1120,7 +1119,7 @@
                     })
                     .filter(function (rule) {
                         const fontName = getFontNameFromRule(rule);
-                        return fontList.includes(fontName) && inliner.shouldProcess(rule.style.getPropertyValue('src'));
+                        return domtoimage.impl.options.fontList.includes(fontName) && inliner.shouldProcess(rule.style.getPropertyValue('src'));
                     });
             }
 
